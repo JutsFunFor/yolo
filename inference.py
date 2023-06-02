@@ -22,37 +22,7 @@ def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_i
     nozzle_id = str(nozzle_id)
 
     if ret:
-        if nozzle_id == '0':
-            yCropMin = crop_config["nozzleId0"]['yCropMin']
-            yCropMax = crop_config["nozzleId0"]['yCropMax']
-            xCropMin = crop_config["nozzleId0"]['xCropMin']
-            xCropMax = crop_config["nozzleId0"]['xCropMax']
-
-            frame0 = frame_raw[yCropMin:yCropMax, xCropMin:xCropMax]
-            pixel_coeff = crop_config["nozzleId0"]["pixelCoeff"]  # real distance in mm in one pixel
-            clipLimit = crop_config["nozzleId0"]["clipLimit"]  # clipLimit for CLAHE equalization
-        else:
-            yCropMin = crop_config["nozzleId1"]['yCropMin']
-            yCropMax = crop_config["nozzleId1"]['yCropMax']
-            xCropMin = crop_config["nozzleId1"]['xCropMin']
-            xCropMax = crop_config["nozzleId1"]['xCropMax']
-
-            frame0 = frame_raw[yCropMin:yCropMax, xCropMin:xCropMax]
-            pixel_coeff = crop_config["nozzleId1"]["pixelCoeff"]  # real distance in mm in one pixel
-            clipLimit = crop_config["nozzleId1"]["clipLimit"]  # clipLimit for CLAHE equalization
-
-        #  Check for latte preprocessing
-        if menu_item_id != latte_id:
-            # Apply hist equalization
-            clahe = cv.createCLAHE(clipLimit=clipLimit, tileGridSize=(3, 3))
-            lab = cv.cvtColor(frame0, cv.COLOR_BGR2LAB)
-            lab[..., 0] = clahe.apply(lab[..., 0])
-            dst_lab = cv.cvtColor(lab, cv.COLOR_LAB2BGR)
-
-            img = letterbox(dst_lab, image_size, stride=32, auto=True)[0]
-
-        else:
-            img = letterbox(frame0, image_size, stride=32, auto=True)[0]
+        img = letterbox(frame_raw, image_size, stride=32, auto=True)[0]
 
         # Convert
         img = img[..., ::-1].transpose((2, 0, 1))  # BGR to RGB, BHWC to BCHW
@@ -120,15 +90,14 @@ def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_i
                 "DateTime": f"{datetime.now().strftime(f)}"}
 
 
-
     for i, det in enumerate(pred):
 
         # gn = torch.tensor(frame_raw.shape)[[1, 0, 1, 0]]  # normalization gain whwh
-        annotator = Annotator(np.ascontiguousarray(frame0), line_width=2, example=str(names))
+        annotator = Annotator(np.ascontiguousarray(frame_raw), line_width=2, example=str(names))
 
         if len(det):
             # Rescale boxes from im_size to frame0 size
-            det[:, :4] = scale_coords(im.shape[2:], det[:, :4], frame0.shape).round()
+            det[:, :4] = scale_coords(im.shape[2:], det[:, :4], frame_raw.shape).round()
 
             # Write results
             for *xyxy, conf, cls in reversed(det):
@@ -148,7 +117,7 @@ def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_i
 
         im0 = annotator.result()
         cv.imwrite(f'{save_pred_path}/{current_date}/{current_time}-{order_number}.png', im0)
-    cv.imwrite(f'{save_raw_path}/{current_date}/{current_time}-{order_number}.png', frame0)
+    cv.imwrite(f'{save_raw_path}/{current_date}/{current_time}-{order_number}.png', frame_raw)
 
     t4 = time_sync()
     dt.append(t2 - t1)  # Capture and crop + change colorspace time
@@ -161,12 +130,6 @@ def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_i
     res_line["Inference_duration"] = f"{np.float32(dt[1]):.2f}"
     res_line["Save_img_duration"] = f"{np.float32(dt[2]):.2f}"
     res_line["Total_time"] = f"{np.float32(dt[3]):.2f}"
-
-    # Add RealDistance if exists to resLine
-    if len(y_max_det) > 1:
-        res_line["RealDistance"] = f"{np.abs(pixel_coeff * (y_max_det[0] - y_max_det[1])):.2f}"
-    else:
-        res_line["RealDistance"] = -1
 
     with open(save_json_path, 'a') as f:
         f.write(json.dumps(str(res_line)) + '\n')

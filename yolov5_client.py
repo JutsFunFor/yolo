@@ -59,7 +59,7 @@ class NatsClient:
                 order_number = data['meta']['orderNumber']
                 # nozzle_id = data['order']['productDump']['nozzleId']
                 menu_item_id = data['order']['menuItemId']
-                reply = run_yolov5(self.rstp_address, self.model, self.thresh, order_number, order_id, nozzle_id,
+                reply = run_yolov5(self.rstp_address, self.model, self.thresh, order_number, order_id,
                                    menu_item_id, self._size, self._latteMenuItemId, self.crop_config)
 
                 # Uncomment if you want to use PostgreSQL support

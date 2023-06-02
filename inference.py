@@ -12,14 +12,14 @@ from datetime import datetime
 import os
 
 
-def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_id, menu_item_id, image_size, latte_id,
+def run_yolov5(cap_address, model_path, thresh, order_number, order_id, menu_item_id, image_size, latte_id,
                crop_config):
     dt = []
     t1 = time_sync()
 
     cap = cv.VideoCapture(rf'{cap_address}')
     ret, frame_raw = cap.read()
-    nozzle_id = str(nozzle_id)
+    # nozzle_id = str(nozzle_id)
 
     if ret:
         img = letterbox(frame_raw, image_size, stride=32, auto=True)[0]
@@ -85,15 +85,12 @@ def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_i
     res_line = {"Detection": {"Coffee": {}, "CupTop": {}},
                 "OrderId": f"{order_id}",
                 "OrderNumber": f"{order_number}",
-                "NozzleId": nozzle_id,
                 "MenuItemId": f"{menu_item_id}",
                 "DateTime": f"{datetime.now().strftime(f)}"}
 
-
     for i, det in enumerate(pred):
-
         # gn = torch.tensor(frame_raw.shape)[[1, 0, 1, 0]]  # normalization gain whwh
-        annotator = Annotator(np.ascontiguousarray(frame_raw), line_width=2, example=str(names))
+        annotator = Annotator(np.ascontiguousarray(frame_raw), line_width=1, example=str(names))
 
         if len(det):
             # Rescale boxes from im_size to frame0 size
@@ -130,6 +127,7 @@ def run_yolov5(cap_address, model_path, thresh, order_number, order_id, nozzle_i
     res_line["Inference_duration"] = f"{np.float32(dt[1]):.2f}"
     res_line["Save_img_duration"] = f"{np.float32(dt[2]):.2f}"
     res_line["Total_time"] = f"{np.float32(dt[3]):.2f}"
+
 
     with open(save_json_path, 'a') as f:
         f.write(json.dumps(str(res_line)) + '\n')

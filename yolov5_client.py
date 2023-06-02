@@ -8,7 +8,7 @@ from postgreSQL import SQLogger
 
 class NatsClient:
     def __init__(self):
-        assert os.path.exists("config.json")
+        #assert os.path.exists("config.json")
         with open("config.json", 'r') as file:
             config = json.load(file)
 
@@ -20,9 +20,11 @@ class NatsClient:
         self._topic = config["inference"]["sendResultsTopic"]
         self.crop_config = config["crop"]
         self._nc = NATS()
-        self._size = (640, 640)  # input tensor shape
+        self._size = (480, 480)  # input tensor shape
         self._actionCompleted_topic = 'complexos.bus.actionCompleted'
         self._latteMenuItemId = config['inference']['latteMenuItemId']
+        print("Config loaded")
+
         # Uncomment if you want to use PostgreSQL support
 
         # self.dbname = config["yolov5_inference"]["dbname"]
@@ -40,14 +42,19 @@ class NatsClient:
     async def receive_msg(self, event_loop):
         """Receive message from self.topic"""
         try:
+            print(f"[INFO receive_msg()] trying to connect {self._url}")
             await self._nc.connect(servers=[self._url], loop=event_loop)
+            print(f"[INFO receive_msg()] succsessfully connected to {self._url}")
         except (ErrNoServers, ErrTimeout) as err:
             print(err)
 
         # Init yolov5 and publish reply
         async def _receive_callback(msg):
+            print("[INFO _receive_callback()] starting read income message")
             data = json.loads(msg.data.decode())
+            print(data['action']['name'])
             if data['action']['name'] == 'take free cup and make a coffee':
+                print(data)
                 order_id = data['action']['orderId']
                 order_number = data['meta']['orderNumber']
                 nozzle_id = data['order']['productDump']['nozzleId']

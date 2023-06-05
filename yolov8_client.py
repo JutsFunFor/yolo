@@ -17,7 +17,6 @@ class NatsClient:
         self._nc = NATS()
         self._size = (config["inference"]['tensor_size'], config["inference"]['tensor_size'])  # input tensor shape
         self._actionCompleted_topic = 'complexos.bus.actionCompleted' # complexos.bus.checkpoint
-        self._latteMenuItemId = config['inference']['latteMenuItemId']
         print("Config loaded")
 
     async def receive_msg(self, event_loop):

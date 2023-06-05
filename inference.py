@@ -32,7 +32,7 @@ def run_yolov8(model_path, cap_address, image_size, conf=0.6):
 if __name__ == "__main__":
 
     start_time = datetime.now()
-    result = run_yolov8('rtsp://admin:pipipi@192.168.1.22', 'best_cm.pt', 480)
+    result = run_yolov8('best_cm.pt', 'rtsp://admin:pipipi@192.168.1.22',  480)
     end_time = datetime.now()
 
     print(f"Total Inference time: {end_time-start_time}")

@@ -27,6 +27,7 @@ def run_yolov8(model_path, cap_address, image_size, conf=0.6):
 
     else:
         print("Image was not captured!")
+    print(res_line)
     return res_line
 
 if __name__ == "__main__":

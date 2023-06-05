@@ -1,3 +1,4 @@
+import datetime
 from nats.aio.client import Client as NATS
 from nats.aio.errors import ErrTimeout, ErrNoServers
 import json
@@ -35,7 +36,7 @@ class NatsClient:
             print(data['action']['name'])
             if data['action']['name'] == 'take free cup and make a coffee':
                 print(data)
-
+                print(datetime.datetime.now())
                 reply = run_yolov8(self.model, self.rstp_address, self._size,  self.conf)
                 reply['OrderId'] = data['action']['orderId']
                 reply['OrderNumber'] = data['meta']['orderNumber']

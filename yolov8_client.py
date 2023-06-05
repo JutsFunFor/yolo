@@ -20,11 +20,11 @@ class NatsClient:
         self._actionCompleted_topic = 'complexos.bus.actionCompleted' # complexos.bus.checkpoint
         print("Config loaded")
 
-    async def receive_msg(self, event_loop):
+    async def receive_msg(self):
         """Receive message from _actionCompleted_topic"""
         try:
             print(f"[INFO receive_msg()] trying to connect {self._url}")
-            await self._nc.connect(servers=[self._url], loop=event_loop)
+            await self._nc.connect(servers=[self._url])
             print(f"[INFO receive_msg()] succsessfully connected to {self._url}")
         except (ErrNoServers, ErrTimeout) as err:
             print(err)

@@ -2,7 +2,6 @@ import cv2 as cv
 from datetime import datetime
 from ultralytics import YOLO
 
-
 def run_yolov8(model_path, cap_address, image_size, conf=0.6):
     # Format to datetime
     f = '%Y-%m-%d %H:%M:%S'

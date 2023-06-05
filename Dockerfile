@@ -6,8 +6,18 @@ ADD https://ultralytics.com/assets/Arial.ttf https://ultralytics.com/assets/Aria
 
 # Install linux packages
 # g++ required to build 'tflite_support' package
+RUN apt update -y && sudo apt upgrade -y && \
+    apt-get install -y wget build-essential checkinstall  libreadline-gplv2-dev  libncursesw5-dev  libssl-dev  libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev && \
+    cd /usr/src && \
+    sudo wget https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz && \
+    sudo tar xzf Python-3.8.10.tgz && \
+    cd Python-3.8.10 && \
+    sudo ./configure --enable-optimizations && \
+    sudo make altinstall
+
+
 RUN apt update \
-    && apt install --no-install-recommends -y python3-pip git zip curl htop libgl1-mesa-glx libglib2.0-0 libpython3-dev gnupg g++ pyhton3.9
+    && apt install --no-install-recommends -y python3-pip git zip curl htop libgl1-mesa-glx libglib2.0-0 libpython3-dev gnupg g++
 # RUN alias python=python3
 
 # Create working directory

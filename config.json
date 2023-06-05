@@ -1,37 +1,11 @@
 {
-    "crop": {
-        "nozzleId0": {
-            "pixelCoeff": 0.2631578947368421,
-            "clipLimit": 1.90,
-            "yCropMin": 700,
-            "yCropMax": 1290,
-            "xCropMin": 112,
-            "xCropMax": 620
-        },
-        "nozzleId1": {
-            "pixelCoeff": 0.23684210526315788,
-            "clipLimit": 1.90,
-            "yCropMin": 520,
-            "yCropMax": 1126,
-            "xCropMin": 1830,
-            "xCropMax": 2480
-        },
-        "rawImagesSavePath": "raw_imgs/",
-        "predictionImagesSavePath": "pred/",
-        "saveJsonResultsPath": "results.json"
-    },
     "inference":
     {
-        "modelPath": "best.pt",
+        "modelPath": "best_cm.pt",
         "rstpAddress": "rtsp://admin:pipipi@192.168.1.22",
-        "threshold": 0.5,
-        "iouThreshold": 0.45,
-        "latteMenuItemId": "01EDXWT7S4KGXHRH12A6TP15AS",
+        "threshold": 0.6,
         "natsUrl": "nats://complexos.local:4222",
-        "sendResultsTopic": "coffee.core.detection",
-        "dbname": "complex1_23",
-        "usr": "pi",
-        "pwd": "3vn4ssps",
-        "host": "localhost"
+        "sendResultsTopic": "complexos.watchdog.inference",
+        "tensor_size": 480
     }
 }

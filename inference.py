@@ -1,19 +1,12 @@
-import json
-import numpy as np
 import cv2 as cv
-from PIL import Image
 from datetime import datetime
 from ultralytics import YOLO
-import os
 
 
-def run_yolov5(cap_address, model_path, image_size, order_number=None, order_id=None, menu_item_id=None):
+def run_yolov8(model_path, cap_address, image_size, conf=0.6):
     # Format to datetime
     f = '%Y-%m-%d %H:%M:%S'
     res_line = {"Detection": {"Nozzle0": {}, "Nozzle1": {}, "Syrup": {}, "HasCup": {}, "NoCup": {}},
-                "OrderId": f"{order_id}",
-                "OrderNumber": f"{order_number}",
-                "MenuItemId": f"{menu_item_id}",
                 "DateTime": f"{datetime.now().strftime(f)}"}
 
     model = YOLO(model_path)
@@ -21,7 +14,7 @@ def run_yolov5(cap_address, model_path, image_size, order_number=None, order_id=
 
     ret, frame = cap.read()
     if ret:
-        results = model.predict(frame, imgsz=image_size, conf=0.6, stream=False)
+        results = model.predict(frame, imgsz=image_size, conf=conf, stream=False)
         for r in results:
             boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy
             for box in boxes:  # iterate boxes
@@ -35,13 +28,13 @@ def run_yolov5(cap_address, model_path, image_size, order_number=None, order_id=
 
     else:
         print("Image was not captured!")
-
-
     return res_line
 
-start_time = datetime.now()
-result = run_yolov5('rtsp://admin:pipipi@192.168.1.22', 'best.pt', 480)
-end_time = datetime.now()
+if __name__ == "__main__":
 
-print(f"Total Inference time: {end_time-start_time}")
-print(result)
+    start_time = datetime.now()
+    result = run_yolov8('rtsp://admin:pipipi@192.168.1.22', 'best_cm.pt', 480)
+    end_time = datetime.now()
+
+    print(f"Total Inference time: {end_time-start_time}")
+    print(result)

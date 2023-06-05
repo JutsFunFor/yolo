@@ -22,7 +22,6 @@ def run_yolov5(cap_address, model_path, image_size, order_number=None, order_id=
     ret, frame = cap.read()
     if ret:
         results = model.predict(frame, imgsz=image_size, conf=0.6, stream=False)
-
         for r in results:
             boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy
             for box in boxes:  # iterate boxes

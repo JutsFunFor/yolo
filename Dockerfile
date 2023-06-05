@@ -7,7 +7,7 @@ ADD https://ultralytics.com/assets/Arial.ttf https://ultralytics.com/assets/Aria
 # Install linux packages
 # g++ required to build 'tflite_support' package
 RUN apt update \
-    && apt install --no-install-recommends -y python3-pip git zip curl htop libgl1-mesa-glx libglib2.0-0 libpython3-dev gnupg g++
+    && apt install --no-install-recommends -y python3-pip git zip curl htop libgl1-mesa-glx libglib2.0-0 libpython3-dev gnupg g++ pyhton3.9
 # RUN alias python=python3
 
 # Create working directory

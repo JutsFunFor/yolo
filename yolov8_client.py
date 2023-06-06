@@ -1,4 +1,5 @@
 import datetime
+import nats
 from nats.aio.client import Client as NATS
 from nats.aio.errors import ErrTimeout, ErrNoServers
 import json
@@ -7,7 +8,7 @@ from inference import run_yolov8
 
 class NatsClient:
     def __init__(self):
-        with open("config.json", 'r') as file:
+        with open("/yolo_cm/config.json", 'r') as file:
             config = json.load(file)
 
         self.model = config["inference"]["modelPath"]
@@ -15,7 +16,6 @@ class NatsClient:
         self.rstp_address = config["inference"]["rstpAddress"]
         self._url = config["inference"]["natsUrl"]
         self.send_topic = config["inference"]["sendResultsTopic"]
-        self._nc = NATS()
         self._size = (config["inference"]['tensor_size'], config["inference"]['tensor_size'])  # input tensor shape
         self._actionCompleted_topic = 'complexos.bus.actionCompleted' # complexos.bus.checkpoint
         print("Config loaded")
@@ -24,7 +24,7 @@ class NatsClient:
         """Receive message from _actionCompleted_topic"""
         try:
             print(f"[INFO receive_msg()] trying to connect {self._url}")
-            await self._nc.connect(servers=[self._url])
+            self._nc = await nats.connect(servers=[self._url])
             print(f"[INFO receive_msg()] succsessfully connected to {self._url}")
         except (ErrNoServers, ErrTimeout) as err:
             print(err)

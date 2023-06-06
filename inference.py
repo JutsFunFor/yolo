@@ -5,12 +5,7 @@ import torch
 import os
 
 def run_yolov8(model_path, cap_address, image_size, conf=0.6):
-    # Format to datetime
-    f = '%Y-%m-%d %H:%M:%S'
-    # res_line = {"Detection": {"Nozzle0": {}, "Nozzle1": {}, "Syrup": {}, "HasCup": {}, "NoCup": {}, "Warning":{}},
-    #             "DateTime": f"{datetime.now().strftime(f)}"}
     res_line = {}
-
 
     model = YOLO(model_path)
     cap = cv.VideoCapture(cap_address)
@@ -34,6 +29,8 @@ def run_yolov8(model_path, cap_address, image_size, conf=0.6):
     else:
         print("Image was not captured!")
     return res_line
+
+
 if __name__ == "__main__":
 
     start_time = datetime.now()

@@ -2,18 +2,20 @@ import cv2 as cv
 from datetime import datetime
 from ultralytics import YOLO
 import torch
-import os
+
 
 def run_yolov8(model_path, cap_address, image_size, conf=0.6):
     res_line = {}
-
+    print(f"[INFO run_yolov8() Time:{datetime.now()}] initializing")
     model = YOLO(model_path)
     cap = cv.VideoCapture(cap_address)
-
+    print(f"[INFO run_yolov8() Time:{datetime.now()}] capture frame")
     ret, frame = cap.read()
 
     if ret:
+        print(f"[INFO run_yolov8() Time:{datetime.now()}] frame was successfully captured, preforming predictions")
         results = model.predict(frame, imgsz=image_size, conf=conf, stream=False, save=True)
+        print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
         for r in results:
             # boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy
             for idx, box in enumerate(r.boxes):  # iterate boxes
@@ -25,9 +27,9 @@ def run_yolov8(model_path, cap_address, image_size, conf=0.6):
                 res_line[cls_name]['Xmax'] = f"{coords[2]}"
                 res_line[cls_name]['Ymax'] = f"{coords[3]}"
                 res_line[cls_name]['Conf'] = f"{box.conf[0]:.2f}"
-
+        print(f"[INFO run_yolov8() Time:{datetime.now()}] creating reply")
     else:
-        print("Image was not captured!")
+        print(f"[INFO run_yolov8() Time:{datetime.now()}] image was not captured!")
     return res_line
 
 

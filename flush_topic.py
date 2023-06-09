@@ -15,7 +15,6 @@ async def receive_msg(event_loop):
     topic3 = "complexos.bus.actionCompleted"
     topic4 = 'complexos.order.*' # from api.js
 
-
     try:
         await nc.connect(servers=[url], loop=event_loop)
         data = {"action":{"name":"take free cup and make a coffee"}}

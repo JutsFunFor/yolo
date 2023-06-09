@@ -26,7 +26,7 @@ class NatsClient:
         """Receive message from _actionCompleted_topic"""
         try:
             print(f"[INFO receive_msg() Time: {datetime.now()}] trying to connect {self._url}")
-            self._nc = await nats.connect(servers=[self._url])
+            self._nc = await nats.connect(servers=[self._url], connect_timeout=20)
             print(f"[INFO receive_msg() Time: {datetime.now()}] successfully connected to {self._url}")
         except (ErrNoServers, ErrTimeout) as err:
             print(f'[Exception receive_msg() Time: {datetime.now()}] {err}')

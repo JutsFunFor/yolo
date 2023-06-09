@@ -3,14 +3,15 @@ import nats
 from nats.aio.errors import ErrTimeout, ErrNoServers
 import json
 from inference import run_yolov8
-
+from ultralytics import YOLO
 
 class NatsClient:
     def __init__(self):
         with open("/yolo_cm/config.json", 'r') as file:
             config = json.load(file)
 
-        self.model = config["inference"]["modelPath"]
+        self.model_path = config["inference"]["modelPath"]
+        self.model = YOLO(self.model_path)
         self.conf = config["inference"]["threshold"]
         self.rstp_address = config["inference"]["rstpAddress"]
         self._url = config["inference"]["natsUrl"]
@@ -18,6 +19,7 @@ class NatsClient:
         self._size = (config["inference"]['tensor_size'], config["inference"]['tensor_size'])  # input tensor shape
         self._action_completed_topic = 'complexos.bus.actionCompleted' # complexos.bus.checkpoint
         self.actions = config["inference"]["actions"]
+
         print(f"[INFO NatsClinet __init__() Time: {datetime.now()}] config successfully loaded!")
 
     async def receive_msg(self):
@@ -31,7 +33,8 @@ class NatsClient:
 
         # Init yolov8 and publish reply
         async def _receive_callback(msg):
-            print(f"[INFO _receive_callback() Time: {datetime.now()}] start reading messages")
+            start = datetime.now()
+            print(f"[INFO _receive_callback() Time: {start}] start reading messages")
             data = json.loads(msg.data.decode())
             print(f"[INFO _receive_callback() Time: {datetime.now()}] receive msg: {data}")
 
@@ -41,7 +44,10 @@ class NatsClient:
                 reply['OrderId'] = data['action']['orderId']
                 reply['OrderNumber'] = data['meta']['orderNumber']
                 reply['MenuItemId'] = data['order']['menuItemId']
-                print(f"[INFO _receive_callback() Time: {datetime.now()}] sending predictions to: {self.send_topic}")
+                end=datetime.now()
+                print(f"[INFO _receive_callback() Time: {end}] sending predictions to: {self.send_topic}")
+                print(f"[INFO _receive_callback() Elapsed Time: {end-start}]")
+                print("-------------------------------------------------------------------------------------------------------------------------------------")
 
                 await self._nc.publish(self.send_topic, json.dumps(reply).encode())
         await self._nc.subscribe(self._action_completed_topic, cb=_receive_callback)

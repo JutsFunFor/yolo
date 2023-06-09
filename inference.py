@@ -4,17 +4,17 @@ from ultralytics import YOLO
 import torch
 
 
-def run_yolov8(model_path, cap_address, image_size, conf=0.6):
+def run_yolov8(model, cap_address, image_size, conf=0.6):
     res_line = {}
     print(f"[INFO run_yolov8() Time:{datetime.now()}] initializing")
-    model = YOLO(model_path)
+
     cap = cv.VideoCapture(cap_address)
     print(f"[INFO run_yolov8() Time:{datetime.now()}] capture frame")
     ret, frame = cap.read()
 
     if ret:
         print(f"[INFO run_yolov8() Time:{datetime.now()}] frame was successfully captured, preforming predictions")
-        results = model.predict(frame, imgsz=image_size, conf=conf, stream=False, save=True)
+        results = model.predict(frame, imgsz=image_size, conf=conf, stream=False, save=False)
         print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
         for r in results:
             # boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy

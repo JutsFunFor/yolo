@@ -13,7 +13,7 @@ async def receive_msg(event_loop):
     topic1 = 'complexos.bus.actionCompleted'
 
     try:
-        await nc.connect(servers=[url], loop=event_loop)
+        await nc.connect(servers=[url], loop=event_loop, connect_timeout=20)
         # create data to imitate complexos query
         data = {"action": {"name": "take free cup and make a coffee", "orderId":"123"},"meta": {"orderNumber":"900"}, "order": {"menuItemId":"2313"}}
         # send query to topic1

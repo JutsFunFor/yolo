@@ -37,7 +37,7 @@ class NatsClient:
 
         # Init yolov8 and publish reply
         async def _receive_callback(msg):
-            with open("./stats/time_stats.csv", "a") as f:
+            with open("/yolo_cm/time_stats.csv", "a") as f:
                 start_t = datetime.now()
                 print(f"[INFO _receive_callback() Time: {start_t}] start reading messages")
                 data = json.loads(msg.data.decode())

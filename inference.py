@@ -4,10 +4,9 @@ from ultralytics import YOLO
 import torch
 
 
-def run_yolov8(model, cap_address, image_size, conf=0.6):
+def run_yolov8(model, cap, image_size, conf=0.6):
     res_line = {}
-    print(f"[INFO run_yolov8() Time:{datetime.now()}] initializing VideoCapture object")
-    cap = cv.VideoCapture(cap_address)
+
     print(f"[INFO run_yolov8() Time:{datetime.now()}] capture frame")
     ret, frame = cap.read()
 

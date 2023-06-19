@@ -21,6 +21,7 @@ class NatsClient:
         self._action_completed_topic = 'complexos.bus.actionCompleted' # complexos.bus.checkpoint
         self.actions = config["inference"]["actions"]
         self.cap = cv.VideoCapture(self.rstp_address)
+        self._connect_timeout = config["inference"]["connectTimeout"]
 
         print(f"[INFO NatsClinet __init__() Time: {datetime.now()}] config successfully loaded!")
 
@@ -55,7 +56,7 @@ class NatsClient:
         try:
             connect_t = datetime.now()
             print(f"[INFO receive_msg() Time: {connect_t}] trying to connect {self._url}")
-            self._nc = await nats.connect(servers=[self._url], connect_timeout=20)
+            self._nc = await nats.connect(servers=[self._url], connect_timeout=self._connect_timeout)
             connected_t = datetime.now()
             print(f"[INFO receive_msg() Time: {connected_t}] successfully connected to {self._url}")
         except (ErrNoServers, ErrTimeout) as err:

@@ -86,5 +86,6 @@ class NatsClient:
                     print(f"[INFO _receive_callback() Elapsed Time: {elapsed_t}]")
                     print("-------------------------------------------------------------------------------------------------------------------------------------")
                     f.write(f"{connect_t},{connected_t},{start_t},{receive_msg_t},{receive_action_t},{end_t},{elapsed_t}\n")
-                await self._nc.publish(self.send_topic, json.dumps(self.reply).encode())
+
+                    await self._nc.publish(self.send_topic, json.dumps(self.reply).encode())
         await self._nc.subscribe(self._action_completed_topic, cb=_receive_callback)

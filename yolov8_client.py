@@ -24,15 +24,15 @@ class NatsClient:
 
         print(f"[INFO NatsClinet __init__() Time: {datetime.now()}] config successfully loaded!")
 
-    def run_yolov8(self, model, cap, image_size, conf=0.6):
+    def run_yolov8(self, model):
         res_line = {}
 
         print(f"[INFO run_yolov8() Time:{datetime.now()}] capture frame")
-        ret, frame = cap.read()
+        ret, frame = self.cap.read()
 
         if ret:
             print(f"[INFO run_yolov8() Time:{datetime.now()}] frame was successfully captured, preforming predictions")
-            results = model.predict(frame, imgsz=image_size, conf=conf, stream=False, save=False)
+            results = model.predict(frame, imgsz=self._size, conf=self.conf, stream=False, save=False)
             print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
             for r in results:
                 # boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy
@@ -73,7 +73,7 @@ class NatsClient:
                 if data['action']['name'] in self.actions:
                     receive_action_t = datetime.now()
                     print(f"[INFO _receive_callback() Time: {receive_action_t}] start capturing action: {data['action']['name']}")
-                    self.reply = self.run_yolov8(self.model, self.cap, self._size,  self.conf)
+                    self.reply = self.run_yolov8(self.model)
                     self.reply['OrderId'] = data['action']['orderId']
                     self.reply['OrderNumber'] = data['meta']['orderNumber']
                     self.reply['MenuItemId'] = data['order']['menuItemId']

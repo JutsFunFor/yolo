@@ -2,8 +2,8 @@ from datetime import datetime
 import nats
 from nats.aio.errors import ErrTimeout, ErrNoServers
 import json
-from inference import run_yolov8
 from ultralytics import YOLO
+import torch
 import cv2 as cv
 
 class NatsClient:
@@ -23,6 +23,32 @@ class NatsClient:
         self.cap = cv.VideoCapture(self.rstp_address)
 
         print(f"[INFO NatsClinet __init__() Time: {datetime.now()}] config successfully loaded!")
+
+    def run_yolov8(self, model, cap, image_size, conf=0.6):
+        res_line = {}
+
+        print(f"[INFO run_yolov8() Time:{datetime.now()}] capture frame")
+        ret, frame = cap.read()
+
+        if ret:
+            print(f"[INFO run_yolov8() Time:{datetime.now()}] frame was successfully captured, preforming predictions")
+            results = model.predict(frame, imgsz=image_size, conf=conf, stream=False, save=False)
+            print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
+            for r in results:
+                # boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy
+                for idx, box in enumerate(r.boxes):  # iterate boxes
+                    cls_name = f"{r.names[int(box.cls[0])]}_{idx}"
+                    coords = box.xyxy[0].type(torch.int)
+                    res_line[cls_name] = {}
+                    res_line[cls_name]['Xmin'] = f"{coords[0]}"
+                    res_line[cls_name]['Ymin'] = f"{coords[1]}"
+                    res_line[cls_name]['Xmax'] = f"{coords[2]}"
+                    res_line[cls_name]['Ymax'] = f"{coords[3]}"
+                    res_line[cls_name]['Conf'] = f"{box.conf[0]:.2f}"
+            print(f"[INFO run_yolov8() Time:{datetime.now()}] creating reply")
+        else:
+            print(f"[INFO run_yolov8() Time:{datetime.now()}] image was not captured!")
+        return res_line
 
     async def receive_msg(self):
         """Receive message from _actionCompleted_topic"""
@@ -47,15 +73,15 @@ class NatsClient:
                 if data['action']['name'] in self.actions:
                     receive_action_t = datetime.now()
                     print(f"[INFO _receive_callback() Time: {receive_action_t}] start capturing action: {data['action']['name']}")
-                    reply = run_yolov8(self.model, self.cap, self._size,  self.conf)
-                    reply['OrderId'] = data['action']['orderId']
-                    reply['OrderNumber'] = data['meta']['orderNumber']
-                    reply['MenuItemId'] = data['order']['menuItemId']
+                    self.reply = self.run_yolov8(self.model, self.cap, self._size,  self.conf)
+                    self.reply['OrderId'] = data['action']['orderId']
+                    self.reply['OrderNumber'] = data['meta']['orderNumber']
+                    self.reply['MenuItemId'] = data['order']['menuItemId']
                     end_t = datetime.now()
                     print(f"[INFO _receive_callback() Time: {end_t}] sending predictions to: {self.send_topic}")
                     elapsed_t = end_t - start_t
                     print(f"[INFO _receive_callback() Elapsed Time: {elapsed_t}]")
                     print("-------------------------------------------------------------------------------------------------------------------------------------")
                     f.write(f"{connect_t},{connected_t},{start_t},{receive_msg_t},{receive_action_t},{end_t},{elapsed_t}\n")
-                await self._nc.publish(self.send_topic, json.dumps(reply).encode())
+                await self._nc.publish(self.send_topic, json.dumps(self.reply).encode())
         await self._nc.subscribe(self._action_completed_topic, cb=_receive_callback)

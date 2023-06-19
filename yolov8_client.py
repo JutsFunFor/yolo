@@ -48,7 +48,7 @@ class NatsClient:
                     res_line[cls_name]['Ymax'] = f"{coords[3]}"
                     res_line[cls_name]['Conf'] = f"{box.conf[0]:.2f}"
             print(f"[INFO run_yolov8() Time:{datetime.now()}] creating reply")
-            self.frame = None
+            self.ret, self.frame = False, None
         else:
             print(f"[INFO run_yolov8() Time:{datetime.now()}] image was not captured!")
         return res_line

@@ -34,9 +34,9 @@ class NatsClient:
 
         if self.ret:
             print(f"[INFO run_yolov8() Time:{datetime.now()}] frame was successfully captured, preforming predictions")
-            results = model.predict(self.frame, imgsz=self._size, conf=self.conf, stream=False, save=False)
+            self.results = model.predict(self.frame, imgsz=self._size, conf=self.conf, stream=False, save=False)
             print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
-            for r in results:
+            for r in self.results:
                 # boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy
                 for idx, box in enumerate(r.boxes):  # iterate boxes
                     cls_name = f"{r.names[int(box.cls[0])]}_{idx}"

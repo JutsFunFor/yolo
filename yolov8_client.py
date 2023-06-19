@@ -48,9 +48,10 @@ class NatsClient:
                     res_line[cls_name]['Ymax'] = f"{coords[3]}"
                     res_line[cls_name]['Conf'] = f"{box.conf[0]:.2f}"
             print(f"[INFO run_yolov8() Time:{datetime.now()}] creating reply")
-            self.ret, self.frame = False, None
         else:
             print(f"[INFO run_yolov8() Time:{datetime.now()}] image was not captured!")
+
+        self.ret, self.frame = False, None
         return res_line
 
     async def receive_msg(self):
@@ -68,7 +69,7 @@ class NatsClient:
         async def _receive_callback(msg):
             with open("/yolo_cm/time_stats.csv", "a") as f:
                 start_t = datetime.now()
-                print(f"[INFO _receive_callback() Time: {start_t}] start reading messages")
+                print(f"[INFO _receive_callback() Time: {start_t}] reading messages")
                 data = json.loads(msg.data.decode())
                 receive_msg_t = datetime.now()
                 print(f"[INFO _receive_callback() Time: {receive_msg_t}] receive msg: {data}")

@@ -6,6 +6,7 @@ from ultralytics import YOLO
 import torch
 import cv2 as cv
 
+
 class NatsClient:
     def __init__(self):
         with open("/yolo_cm/config.json", 'r') as file:
@@ -29,11 +30,11 @@ class NatsClient:
         res_line = {}
 
         print(f"[INFO run_yolov8() Time:{datetime.now()}] capture frame")
-        ret, frame = self.cap.read()
+        self.ret, self.frame = self.cap.read()
 
-        if ret:
+        if self.ret:
             print(f"[INFO run_yolov8() Time:{datetime.now()}] frame was successfully captured, preforming predictions")
-            results = model.predict(frame, imgsz=self._size, conf=self.conf, stream=False, save=False)
+            results = model.predict(self.frame, imgsz=self._size, conf=self.conf, stream=False, save=False)
             print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
             for r in results:
                 # boxes = r.boxes.cpu().numpy()  # get boxes on cpu in numpy

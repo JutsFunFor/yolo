@@ -15,15 +15,17 @@ class CameraBufferCleanerThread(threading.Thread):
         self.camera = camera
         self.last_frame = None
         self.lock = threading.Lock()  # Lock for thread safety
+        self.is_running = True  # Flag to signal thread termination
         super(CameraBufferCleanerThread, self).__init__(name=name)
-        self.start()
 
     def run(self):
-        while True:
+        while self.is_running:
             ret, frame = self.camera.read()
             with self.lock:
                 self.last_frame = frame
 
+    def stop(self):
+        self.is_running = False
 
 class NatsClient:
 
@@ -50,6 +52,7 @@ class NatsClient:
 
         def signal_handler(sig, frame):
             print('Ctrl+C pressed. Cleaning up...')
+            self.cam_cleaner.stop()
             self.cam_cleaner.join()
             self.cap.release()
             sys.exit(0)

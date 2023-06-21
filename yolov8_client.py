@@ -50,7 +50,6 @@ class NatsClient:
 
         def signal_handler(sig, frame):
             print('Ctrl+C pressed. Cleaning up...')
-            self.cam_cleaner.stop()
             self.cam_cleaner.join()
             self.cap.release()
             sys.exit(0)

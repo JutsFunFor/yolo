@@ -6,6 +6,8 @@ from ultralytics import YOLO
 import torch
 import cv2 as cv
 import threading
+import sys
+import signal
 
 
 class CameraBufferCleanerThread(threading.Thread):
@@ -45,6 +47,15 @@ class NatsClient:
 
     def run_yolov8(self):
         res_line = {}
+
+        def signal_handler(sig):
+            print('Ctrl+C pressed. Cleaning up...')
+            self.cam_cleaner.stop()
+            self.cam_cleaner.join()
+            self.cap.release()
+            sys.exit(0)
+
+        signal.signal(signal.SIGINT, signal_handler)
 
         with self.cam_cleaner.lock:
             if self.cam_cleaner.last_frame is not None:

@@ -1,11 +1,15 @@
 import asyncio
 from yolov8_client import NatsClient
-
+import sys
+import signal
 if __name__ == '__main__':
+
     config_path = "/yolo_cm/config.json"
-    # client = NatsClient(config_path)
+    client = NatsClient(config_path)
+
+
     loop = asyncio.get_event_loop()
-    loop.create_task(NatsClient(config_path).receive_msg())
+    loop.create_task(client.receive_msg())
 
     try:
         loop.run_forever()

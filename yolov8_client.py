@@ -15,17 +15,19 @@ class CameraBufferCleanerThread(threading.Thread):
         self.camera = camera
         self.last_frame = None
         self.lock = threading.Lock()  # Lock for thread safety
-        self.is_running = True  # Flag to signal thread termination
+        self.flag = False
         super(CameraBufferCleanerThread, self).__init__(name=name)
+        self.start()
 
     def run(self):
-        while self.is_running:
+        while True:
+            if self.flag:
+                break
             ret, frame = self.camera.read()
             with self.lock:
                 self.last_frame = frame
-
     def stop(self):
-        self.is_running = False
+        self.flag = True
 
 class NatsClient:
 

@@ -48,7 +48,7 @@ class NatsClient:
     def run_yolov8(self):
         res_line = {}
 
-        def signal_handler():
+        def signal_handler(sig, frame):
             print('Ctrl+C pressed. Cleaning up...')
             self.cam_cleaner.stop()
             self.cam_cleaner.join()

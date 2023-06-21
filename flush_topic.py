@@ -11,11 +11,12 @@ async def receive_msg(event_loop):
     url = 'nats://complexos.local:4222'
     # url = "nats://demo.nats.io:4222"
     topic1 = 'complexos.bus.actionCompleted'
+    # topic1 = 'complexos.watchdog.inference'
 
     try:
         await nc.connect(servers=[url], loop=event_loop, connect_timeout=20)
         # create data to imitate complexos query
-        data = {"action": {"name": "take free cup and make a coffee", "orderId":"123"},"meta": {"orderNumber":"900"}, "order": {"menuItemId":"2313"}}
+        data = {"action": {"action": "take free cup and make a coffee", "orderId": "323"}, "meta": {"orderNumber":"930"}, "order": {"menuItemId":"2313"}}
         # send query to topic1
         await nc.publish(topic1, json.dumps(data).encode())
     except (ErrNoServers, ErrTimeout) as err:

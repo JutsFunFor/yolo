@@ -2,8 +2,8 @@
     "inference":
     {
         "modelPath": "/yolo_cm/best_cm.pt",
-        "rstpAddress": "rtsp://admin:pipipi@192.168.1.22",
-        "threshold": 0.6,
+        "rtspAddress": "rtsp://admin:pipipi@192.168.1.22:554/h264Preview_01_sub",
+        "threshold": 0.4,
         "natsUrl": "nats://192.168.1.43:4222",
         "connectTimeout": 25,
         "sendResultsTopic": "complexos.watchdog.inference",

@@ -1,37 +1,14 @@
 {
-    "crop": {
-        "nozzleId0": {
-            "pixelCoeff": 0.2631578947368421,
-            "clipLimit": 1.90,
-            "yCropMin": 700,
-            "yCropMax": 1290,
-            "xCropMin": 112,
-            "xCropMax": 620
-        },
-        "nozzleId1": {
-            "pixelCoeff": 0.23684210526315788,
-            "clipLimit": 1.90,
-            "yCropMin": 520,
-            "yCropMax": 1126,
-            "xCropMin": 1830,
-            "xCropMax": 2480
-        },
-        "rawImagesSavePath": "raw_imgs/",
-        "predictionImagesSavePath": "pred/",
-        "saveJsonResultsPath": "results.json"
-    },
     "inference":
     {
-        "modelPath": "best.pt",
-        "rstpAddress": "rtsp://admin:pipipi@192.168.1.22",
-        "threshold": 0.5,
-        "iouThreshold": 0.45,
-        "latteMenuItemId": "01EDXWT7S4KGXHRH12A6TP15AS",
-        "natsUrl": "nats://complexos.local:4222",
-        "sendResultsTopic": "coffee.core.detection",
-        "dbname": "complex1_23",
-        "usr": "pi",
-        "pwd": "3vn4ssps",
-        "host": "localhost"
+        "modelPath": "/yolo_cm/best_cm.pt",
+        "rtspAddress": "rtsp://admin:pipipi@192.168.1.22:554/h264Preview_01_sub",
+        "threshold": 0.4,
+        "natsUrl": "nats://192.168.1.43:4222",
+        "connectTimeout": 25,
+        "sendResultsTopic": "complexos.watchdog.inference",
+        "actionCompletedTopic": "complexos.bus.actionCompleted",
+        "tensorSize": 480,
+        "actions": ["take free cup and make a coffee", "Starting making coffee.", "Moving M1 to take free cup", "Starting tweak", "Ended tweak", "Cup taken. Moving M1 to nozzle", "Executing pre brew actions (sirups)", "Executing pre brew actions done (sirups)", "M1 arrived, waiting for nozzle", "Nozzle ready. Putting cup", "Coffemachine starting brew", "Brewed. Executing post-brew actions (extramilk)", "Coffeemachine brew failure", "Coffee ready"]
     }
 }

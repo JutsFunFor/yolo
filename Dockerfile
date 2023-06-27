@@ -23,7 +23,6 @@ RUN git clone https://github.com/ultralytics/ultralytics /usr/src/ultralytics
 RUN python3 -m pip install --upgrade pip wheel
 RUN pip install --no-cache -e . thop --extra-index-url https://download.pytorch.org/whl/cpu
 
-
 COPY requirements.txt ./
 RUN pip install asyncio-nats-streaming
 

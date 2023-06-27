@@ -53,8 +53,8 @@ class NatsClient:
         self.rtsp_address = config["inference"]["rtspAddress"]
         self._url = config["inference"]["natsUrl"]
         self.send_topic = config["inference"]["sendResultsTopic"]
-        self._size = (config["inference"]['tensor_size'], config["inference"]['tensor_size'])  # input tensor shape
-        self._action_completed_topic = 'complexos.bus.actionCompleted'  # complexos.bus.checkpoint
+        self._size = (config["inference"]['tensorSize'], config["inference"]['tensorSize'])  # input tensor shape
+        self._action_completed_topic = config["inference"]["actionCompletedTopic"]  # complexos.bus.checkpoint
         self.actions = config["inference"]["actions"]
         self._connect_timeout = config["inference"]["connectTimeout"]
         self.cap = cv.VideoCapture(self.rtsp_address)

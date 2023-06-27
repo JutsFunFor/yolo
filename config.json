@@ -7,7 +7,8 @@
         "natsUrl": "nats://192.168.1.43:4222",
         "connectTimeout": 25,
         "sendResultsTopic": "complexos.watchdog.inference",
-        "tensor_size": 480,
+        "actionCompletedTopic": "complexos.bus.actionCompleted",
+        "tensorSize": 480,
         "actions": ["take free cup and make a coffee", "Starting making coffee.", "Moving M1 to take free cup", "Starting tweak", "Ended tweak", "Cup taken. Moving M1 to nozzle", "Executing pre brew actions (sirups)", "Executing pre brew actions done (sirups)", "M1 arrived, waiting for nozzle", "Nozzle ready. Putting cup", "Coffemachine starting brew", "Brewed. Executing post-brew actions (extramilk)", "Coffeemachine brew failure", "Coffee ready"]
     }
 }

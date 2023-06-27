@@ -29,9 +29,10 @@
 
 `tensorSize` - default image size for model input
 
-`actions` - list of actions to perform inference
+`actions` - list of actions to perform inference (add actions if neccessary)
 
 # Run docker image
-You have to mount volume that contains scripts into docker container 
+You have to mount volume that contains inference scripts into docker container 
+Do not forget to change `modelPath` prefix in config to `/yolo_cm/best_cm.pt` or `/yolo_left/best_left.pt` or `/yolo_right/best_right.pt` in order to mount this path like below: 
  
 `sudo docker run -it -v /home/...YOUR_PATH.../yolo:/yolo_cm  --privileged alekseyml/yolov8:nuke python3 /yolo_cm/yolov8_service.py`

@@ -34,7 +34,7 @@
 # Run docker image
 You have to mount volume that contains inference scripts into docker container.
 
-Do not forget to change `modelPath` prefix in config to `/yolo_cm/best_cm.pt` or `/yolo_left/best_left.pt` or `/yolo_right/best_right.pt` in order to mount this path like below:
+Do not forget to change `modelPath` prefix in config to `/yolo_cm/best_cm.pt` or `/yolo_left/best_left.pt` or `/yolo_right/best_right.pt` in order to mount this path:
 
 `export YOLO_CM="/yolo_cm/yolov8_service.py /yolo_cm/config.json"`
 
@@ -48,6 +48,33 @@ Kiosk inference cm model example:
 
 `sudo docker run -it -v /home/foodtronics/yolo:/yolo_cm  --privileged alekseyml/yolov8:nuke python3 $YOLO_CM`
 
-Kiosk inference left model example (do not forget to change `modelPath` from `/yolo_cm/best_cm.pt` to  `/yolo_left/best_left.pt` and camera IP):
+Kiosk left model example (do not forget to change `modelPath` from `/yolo_cm/best_cm.pt` to  `/yolo_left/best_left.pt` and camera IP):
 
 `sudo docker run -it -v /home/foodtronics/yolo:/yolo_left  --privileged alekseyml/yolov8:nuke python3 $YOLO_LEFT`
+
+Kiosk right model example:
+
+`sudo docker run -it -v /home/foodtronics/yolo:/yolo_right  --privileged alekseyml/yolov8:nuke python3 $YOLO_RIGHT`
+
+# Inference result line
+Multiclass detection assumes that there are several objects on image that can be refered to the same class. So, result line (results after detection that are sent to `sendResultsTopic` in json format) contains class name + `_idx` postfix. 
+This postfix refers to object index on image. For example result class name can be represented as `Warning_0`, `Warning_1`, ... `Warnign_N`. 
+
+## Base class names for CM model:
+
+`Nozzle0`, `Nozzle1`, `Warning`, `HasCup`, `NoCup`, `Flood`
+
+## Base class names for RIGHT model:
+
+`Buffer0` - `Buffer6`, `Flood`, `LiftCup2`, `LiftCup3`, `LiftEmpty2`, `LiftEmpty3`, `NoCup1`, `NoCup2`, `Warning`, `hasCup1`, `hasCup2`
+
+## Base class names for LEFT model:
+
+`Buffer0` - `Buffer6`,  `Flood`, `HasCup1`, `hasCup2`, `LiftCup1`, `LiftCup2`, `LiftEmpty1`, `LiftEmpty2`, `NoCup1`, `NoCup2`, `NozzleCup0`, `NozzleCup1`, `NozzleEmpty0`, `NozzleEmpty1`, `Warning`
+
+For each class name there are `Xmin`, `Ymin`, `Xmax`, `Ymax` and `Conf` parameters (parse as string).
+
+There are also `OrderId`, `OrderNumber`, `MenuItemId` parameters wich are parsed from topic message. You can manually disable this bechavior commenting 
+
+# Dataset
+https://app.roboflow.com/coffee200all

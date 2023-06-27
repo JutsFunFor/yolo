@@ -74,7 +74,19 @@ This postfix refers to object index on image. For example result class name can 
 
 For each class name there are `Xmin`, `Ymin`, `Xmax`, `Ymax` and `Conf` parameters (parse as string).
 
-There are also `OrderId`, `OrderNumber`, `MenuItemId` parameters wich are parsed from topic message. You can manually disable this bechavior commenting 
+There are also `OrderId`, `OrderNumber`, `MenuItemId` parameters wich are parsed from topic message. You can manually disable this behaviour commenting 124-126 line `yolov8_client.py`
 
-# Dataset
-https://app.roboflow.com/coffee200all
+# Dataset & weights
+
+Dataset available at `roboflow` https://app.roboflow.com/coffee200all
+
+For new cases of detector usage you have to update weights. 
+
+1) Upload new cases (video or images) to `roboflow`
+2) Label that samples according existing dataset (check for all already labeled images)
+3) Export dataset with yolov8 format from roboflow
+4) Traing model on new dataset
+5) Choose best weights and load it into git repo
+   
+Workflow described at https://blog.roboflow.com/how-to-train-yolov8-on-a-custom-dataset/.
+

@@ -11,26 +11,38 @@ import signal
 
 
 class CameraBufferCleanerThread(threading.Thread):
+    """Read camera stream from thread.
+       Save last frame to self.last_frame attribute
+       This last frame will be used for detection after nats-topic call.
+    """
     def __init__(self, camera, name='camera-buffer-cleaner-thread'):
+        """Init class"""
         self.camera = camera
         self.last_frame = None
         self.lock = threading.Lock()  # Lock for thread safety
-        self.flag = False
+        self.flag = False # Ctrl+C handle
         super(CameraBufferCleanerThread, self).__init__(name=name)
         self.start()
 
     def run(self):
+        """Read rtsp stream. Save frame to self.last_frame attribute.
+           Break if Ctrl+C command occurs.
+        """
         while True:
             if self.flag:
                 break
             ret, frame = self.camera.read()
             with self.lock:
                 self.last_frame = frame
+
     def stop(self):
         self.flag = True
 
-class NatsClient:
 
+class NatsClient:
+    """Input: config.json path. Class provides logic for initialization model, rtsp stream, nats-connection.
+       Async callback listens nats-topic -> runs yolov8 inference on defined in config.json actions -> sends detection results to defined in config.json topic.
+    """
     def __init__(self, path):
         with open(path, 'r') as file:
             config = json.load(file)
@@ -42,30 +54,32 @@ class NatsClient:
         self._url = config["inference"]["natsUrl"]
         self.send_topic = config["inference"]["sendResultsTopic"]
         self._size = (config["inference"]['tensor_size'], config["inference"]['tensor_size'])  # input tensor shape
-        self._action_completed_topic = 'complexos.bus.actionCompleted' # complexos.bus.checkpoint
+        self._action_completed_topic = 'complexos.bus.actionCompleted'  # complexos.bus.checkpoint
         self.actions = config["inference"]["actions"]
         self._connect_timeout = config["inference"]["connectTimeout"]
         self.cap = cv.VideoCapture(self.rtsp_address)
         self.cam_cleaner = CameraBufferCleanerThread(self.cap)
         print(f"[INFO NatsClinet __init__() Time: {datetime.now()}] config successfully loaded!")
 
+    def signal_handler(self, sig, frame):
+        """Ctrl+C safe exit handler"""
+        print('Ctrl+C pressed. Cleaning up...')
+        self.cam_cleaner.stop()
+        self.cam_cleaner.join()
+        self.cap.release()
+        sys.exit(0)
+
     def run_yolov8(self):
+        """Model inference"""
         res_line = {}
-
-        def signal_handler(sig, frame):
-            print('Ctrl+C pressed. Cleaning up...')
-            self.cam_cleaner.stop()
-            self.cam_cleaner.join()
-            self.cap.release()
-            sys.exit(0)
-
-        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGINT, self.signal_handler)
 
         with self.cam_cleaner.lock:
             if self.cam_cleaner.last_frame is not None:
 
                 print(f"[INFO run_yolov8() Time:{datetime.now()}] preforming predictions")
-                results = self.model.predict(self.cam_cleaner.last_frame, imgsz=self._size, conf=self.conf, stream=False, save=False)
+                results = self.model.predict(self.cam_cleaner.last_frame, imgsz=self._size, conf=self.conf,
+                                             stream=False, save=False)
                 print(f"[INFO run_yolov8() Time:{datetime.now()}] predictions were made")
                 for r in results:
                     for idx, box in enumerate(r.boxes):  # iterate boxes
@@ -78,11 +92,10 @@ class NatsClient:
                         res_line[cls_name]['Ymax'] = f"{coords[3]}"
                         res_line[cls_name]['Conf'] = f"{box.conf[0]:.2f}"
                 print(f"[INFO run_yolov8() Time:{datetime.now()}] creating reply")
-
         return res_line
 
     async def receive_msg(self):
-        """Receive message from _actionCompleted_topic"""
+        """Receive message from self._action_completed_topic"""
         try:
             connect_t = datetime.now()
             print(f"[INFO receive_msg() Time: {connect_t}] trying to connect {self._url}")
@@ -95,7 +108,7 @@ class NatsClient:
 
         # Init yolov8 and publish reply
         async def _receive_callback(msg):
-
+            """Handle income messages"""
             with open("/yolo_cm/time_stats.csv", "a") as f:
                 start_t = datetime.now()
                 print(f"[INFO _receive_callback() Time: {start_t}] reading messages")
@@ -104,9 +117,9 @@ class NatsClient:
                 print(f"[INFO _receive_callback() Time: {receive_msg_t}] receive msg: {data}")
 
                 if data['action']['action'] in self.actions:
-
                     receive_action_t = datetime.now()
                     print(f"[INFO _receive_callback() Time: {receive_action_t}] start capturing action: {data['action']['action']}")
+                    # run model
                     self.reply = self.run_yolov8()
                     self.reply['OrderId'] = data['action']['orderId']
                     self.reply['OrderNumber'] = data['meta']['orderNumber']
